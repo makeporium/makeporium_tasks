@@ -1,26 +1,41 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.handler = async function(event, context) {
-    try {
-        const { completed } = JSON.parse(event.body);
-        const tasksFile = path.resolve(__dirname, '../../public/tasks.txt');
-        const completedFile = path.resolve(__dirname, '../../public/completed.txt');
+exports.handler = async (event) => {
+    if (event.httpMethod === 'POST') {
+        try {
+            const { completed } = JSON.parse(event.body);
+            const tasksFilePath = path.resolve('./public/tasks.txt');
+            const completedFilePath = path.resolve('./public/completed.txt');
 
-        const allTasks = fs.readFileSync(tasksFile, 'utf-8').split('\n').filter(task => task.trim() !== '');
-        const remainingTasks = allTasks.filter(task => !completed.includes(task));
+            if (!fs.existsSync(tasksFilePath)) {
+                throw new Error('Tasks file not found');
+            }
 
-        fs.writeFileSync(completedFile, completed.join('\n') + '\n', { flag: 'a' });
-        fs.writeFileSync(tasksFile, remainingTasks.join('\n') + '\n');
+            const allTasks = fs.readFileSync(tasksFilePath, 'utf8').split('\n').filter(task => task.trim() !== '');
+            
+            // Append completed tasks to completed.txt
+            fs.appendFileSync(completedFilePath, completed.join('\n') + '\n');
 
+            // Remove completed tasks from tasks.txt
+            const remainingTasks = allTasks.filter(task => !completed.includes(task));
+            fs.writeFileSync(tasksFilePath, remainingTasks.join('\n') + '\n');
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Tasks updated successfully.' }),
+            };
+        } catch (error) {
+            console.error('Error processing tasks:', error.message);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: 'Internal server error.', error: error.message }),
+            };
+        }
+    } else {
         return {
-            statusCode: 200,
-            body: JSON.stringify({ message: 'Tasks updated successfully' })
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to save tasks' })
+            statusCode: 405,
+            body: JSON.stringify({ message: 'Method not allowed.' }),
         };
     }
 };
