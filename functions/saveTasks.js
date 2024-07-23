@@ -8,7 +8,13 @@ exports.handler = async (event) => {
             const tasksFilePath = path.resolve('./public/tasks.txt');
             const completedFilePath = path.resolve('./public/completed.txt');
 
-            if (!fs.existsSync(tasksFilePath)) {
+            console.log('Tasks file path:', tasksFilePath);
+            console.log('Completed file path:', completedFilePath);
+            console.log('Current working directory:', process.cwd());
+
+            if (fs.existsSync(tasksFilePath)) {
+                console.log('Tasks file exists.');
+            } else {
                 throw new Error('Tasks file not found');
             }
 
