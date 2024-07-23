@@ -5,8 +5,8 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
         try {
             const { completed } = JSON.parse(event.body);
-            const tasksFilePath = path.resolve('./tasks.txt');
-            const completedFilePath = path.resolve('./completed.txt');
+            const tasksFilePath = path.resolve('./var/task/tasks.txt');
+            const completedFilePath = path.resolve('./var/task/completed.txt');
 
             console.log('Tasks file path:', tasksFilePath);
             console.log('Completed file path:', completedFilePath);
