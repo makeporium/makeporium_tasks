@@ -24,7 +24,7 @@ function saveCompletedTasks() {
     const completedTasks = Array.from(checkboxes).map(checkbox => checkbox.value);
 
     if (completedTasks.length > 0) {
-        fetch('/.netlify/functions/saveTasks', {
+        fetch('/.netlify/functions/saveTasks.js', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
