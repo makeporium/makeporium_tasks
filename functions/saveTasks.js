@@ -1,47 +1,46 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.handler = async (event) => {
+exports.handler = async function(event, context) {
+    console.log('Function triggered');
     if (event.httpMethod === 'POST') {
         try {
-            const { completed } = JSON.parse(event.body);
-            const tasksFilePath = path.resolve('./tasks.txt');
-            const completedFilePath = path.resolve('/completed.txt');
+            const data = JSON.parse(event.body);
+            console.log('Data received:', data);
+            const completedTasks = data.completed;
 
-            console.log('Tasks file path:', tasksFilePath);
-            console.log('Completed file path:', completedFilePath);
-            console.log('Current working directory:', process.cwd());
+            const tasksPath = path.resolve(__dirname, '../../tasks.txt');
+            const completedPath = path.resolve(__dirname, '../../completed.txt');
 
-            if (fs.existsSync(tasksFilePath)) {
-                console.log('Tasks file exists.');
-            } else {
-                throw new Error('Tasks file not found');
-            }
+            console.log('Paths:', tasksPath, completedPath);
 
-            const allTasks = fs.readFileSync(tasksFilePath, 'utf8').split('\n').filter(task => task.trim() !== '');
-            
-            // Append completed tasks to completed.txt
-            fs.appendFileSync(completedFilePath, completed.join('\n') + '\n');
+            const allTasks = fs.readFileSync(tasksPath, 'utf-8').split('\n').filter(task => task.trim() !== '');
+            console.log('All tasks:', allTasks);
+
+            // Save completed tasks to completed.txt
+            fs.appendFileSync(completedPath, completedTasks.join('\n') + '\n');
+            console.log('Completed tasks saved');
 
             // Remove completed tasks from tasks.txt
-            const remainingTasks = allTasks.filter(task => !completed.includes(task));
-            fs.writeFileSync(tasksFilePath, remainingTasks.join('\n') + '\n');
+            const remainingTasks = allTasks.filter(task => !completedTasks.includes(task));
+            fs.writeFileSync(tasksPath, remainingTasks.join('\n') + '\n');
+            console.log('Remaining tasks saved');
 
             return {
                 statusCode: 200,
-                body: JSON.stringify({ message: 'Tasks updated successfully.' }),
+                body: JSON.stringify({ success: true })
             };
         } catch (error) {
-            console.error('Error processing tasks:', error.message);
+            console.error('Error:', error);
             return {
                 statusCode: 500,
-                body: JSON.stringify({ message: 'Internal server error.', error: error.message }),
+                body: JSON.stringify({ success: false, error: error.message })
             };
         }
     } else {
         return {
             statusCode: 405,
-            body: JSON.stringify({ message: 'Method not allowed.' }),
+            body: 'Method Not Allowed'
         };
     }
 };
