@@ -10,8 +10,9 @@ exports.handler = async function(event, context) {
             const completedTasks = data.completed;
 
             // Corrected relative paths
-            const tasksPath = path.join(__dirname, '..', 'tasks.txt');
-            const completedPath = path.join(__dirname, '..', 'completed.txt');
+           const tasksPath = path.join(__dirname, '..', '..', 'main', 'tasks.txt');
+const completedPath = path.join(__dirname, '..', '..', 'main', 'completed.txt');
+
 
             console.log('Paths:', tasksPath, completedPath);
 
