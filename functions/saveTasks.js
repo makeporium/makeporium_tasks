@@ -9,9 +9,9 @@ exports.handler = async function(event, context) {
             console.log('Data received:', data);
             const completedTasks = data.completed;
 
-            // Use relative paths correctly
-            const tasksPath = path.resolve(__dirname, '../tasks.txt');
-            const completedPath = path.resolve(__dirname, '../completed.txt');
+            // Corrected relative paths
+            const tasksPath = path.resolve(process.cwd(), 'tasks.txt');
+            const completedPath = path.resolve(process.cwd(), 'completed.txt');
 
             console.log('Paths:', tasksPath, completedPath);
 
